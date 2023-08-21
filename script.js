@@ -12,32 +12,32 @@ let prevBtn = document.querySelector(".prev-track");
 
 let trackIndex = 0;
 let isPlaying = false;
-let isHidden= true;
+let isHidden = true;
 
-let currentTrack = document.createElement("audio");
+let currentTrack = new Audio();
 let soundBars = document.querySelector(".sound-bars");
 
-togglePlayer.addEventListener("click", function(){
-    isHidden = !isHidden;
-    if(isHidden){
-        musicPlayer.classList.remove("hide");
-        togglePlayer.innerHTML = '<ion-icon name="remove-outline"></ion-icon>';
-        trackInfo.style.transitionDelay = "0.4s";
-        trackNav.style.transitionDelay = "0.4s";
-    }else{
-        musicPlayer.classList.add("hide");
-        togglePlayer.innerHTML = '<ion-icon name="add-outline"></ion-icon>';
-        trackInfo.style.transitionDelay = "0s";
-        trackNav.style.transitionDelay = "0s";
-    }
+togglePlayer.addEventListener("click", function () {
+  isHidden = !isHidden;
+  if (isHidden) {
+    musicPlayer.classList.remove("hide");
+    togglePlayer.innerHTML = '<ion-icon name="remove-outline"></ion-icon>';
+    trackInfo.style.transitionDelay = "0.4s";
+    trackNav.style.transitionDelay = "0.4s";
+  } else {
+    musicPlayer.classList.add("hide");
+    togglePlayer.innerHTML = '<ion-icon name="add-outline"></ion-icon>';
+    trackInfo.style.transitionDelay = "0s";
+    trackNav.style.transitionDelay = "0s";
+  }
 });
 
 let soundBarsLottie = bodymovin.loadAnimation({
-    container: soundBars,
-    renderer: "svg",
-    loop: true,
-    autoPlay: false,
-    path: "http://assets5.lottiefiles.com/packages/lf20_jJJl6i.json",
+  container: soundBars,
+  renderer: "svg",
+  loop: true,
+  autoPlay: false,
+  path: "http://assets5.lottiefiles.com/packages/lf20_jJJl6i.json",
 });
 
 let trackList = [
@@ -60,45 +60,49 @@ let trackList = [
     },
 ];
 
-function loadTrack(trackIndex){
+function loadTrack(trackIndex) {
+    currentTrack.pause(); // Pause the previous track
+    currentTrack = new Audio(); // Create a new audio element
     currentTrack.src = trackList[trackIndex].path;
     currentTrack.load();
     trackName.textContent = trackList[trackIndex].name;
     trackArtist.textContent = trackList[trackIndex].artist;
     currentTrack.addEventListener("ended", nextTrack);
-}
-
-loadTrack(trackIndex);
-
-function playPauseTrack(){
-    if(!isPlaying) playTrack();
-    else playTrack();
-}
-
-function playTrack(){
+  }
+  
+  function playPauseTrack() {
+    if (isPlaying) {
+      pauseTrack();
+    } else {
+      playTrack();
+    }
+  }
+  
+  function playTrack() {
     currentTrack.play();
     isPlaying = true;
     playPauseBtn.innerHTML = '<ion-icon name="pause-sharp"></ion-icon>';
     soundBarsLottie.playSegment([0, 120], true);
-}
-
-function pauseTrack(){
+  }
+  
+  function pauseTrack() {
     currentTrack.pause();
     isPlaying = false;
     playPauseBtn.innerHTML = '<ion-icon name="play-sharp"></ion-icon>';
     soundBarsLottie.stop();
-}
-
-function nextTrack(){
-    if(trackIndex < trackIndex.length -1) trackIndex += 1;
-    else trackIndex = 0;
+  }
+  
+  function nextTrack() {
+    trackIndex = (trackIndex + 1) % trackList.length;
     loadTrack(trackIndex);
     playTrack();
-}
-
-function prevTrack(){
-    if(trackIndex < 0) trackIndex -= 1;
-    else trackIndex = trackList.length;
+  }
+  
+  function prevTrack() {
+    trackIndex = (trackIndex - 1 + trackList.length) % trackList.length;
     loadTrack(trackIndex);
     playTrack();
-}
+  }
+  
+  // Load the initial track
+  loadTrack(trackIndex);
